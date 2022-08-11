@@ -486,7 +486,7 @@
                 "type": "apiKey",
                 "in": "header",
                 "name": "Authorization",
-                "description": "Authentication for Django RESTful API FBV"
+                "description": "Authentication for Flask API SQLAlchemy JWT"
             }
         },
         "schemas": {

@@ -9,5 +9,7 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+jwt = JWTManager(app)
+
 from app.model import user, categories, products
 from app import routes

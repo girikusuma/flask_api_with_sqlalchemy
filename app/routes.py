@@ -3,6 +3,7 @@ from flask import request, jsonify
 from app.controller import categories_controller as CategoryController
 from app.controller import products_controller as ProductController
 from app.controller import user_controller as UserController
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 @app.route("/")
 def index():
@@ -15,7 +16,15 @@ def register():
     else:
         raise Exception("Method not allowed")
 
+@app.route("/login/", methods=['POST'])
+def login():
+    if request.method == 'POST':
+        return UserController.login()
+    else:
+        raise Exception("Method not allowed")
+
 @app.route("/categories/", methods=['GET', 'POST'])
+@jwt_required()
 def categories_list():
     if request.method == 'GET':
         return CategoryController.index()
@@ -25,6 +34,7 @@ def categories_list():
         raise Exception("Method not allowed")
 
 @app.route("/categories/<int:id>/", methods=['GET','PUT', 'DELETE'])
+@jwt_required()
 def categories_detail(id):
     if request.method == 'GET':
         return CategoryController.detail(id)
@@ -36,6 +46,7 @@ def categories_detail(id):
         raise Exception("Method not allowed")
 
 @app.route("/products/", methods=['GET', 'POST'])
+@jwt_required()
 def products_list():
     if request.method == 'GET':
         return ProductController.index()
@@ -45,6 +56,7 @@ def products_list():
         raise Exception("Method not allowed")
 
 @app.route("/products/<int:id>/", methods=['GET','PUT', 'DELETE'])
+@jwt_required()
 def products_detail(id):
     if request.method == 'GET':
         return ProductController.detail(id)
@@ -54,4 +66,3 @@ def products_detail(id):
         return ProductController.destroy(id)
     else:
         raise Exception("Method not allowed")
-

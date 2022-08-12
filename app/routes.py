@@ -66,3 +66,11 @@ def products_detail(id):
         return ProductController.destroy(id)
     else:
         raise Exception("Method not allowed")
+
+@app.route("/products-galery/", methods=['POST'])
+@jwt_required()
+def products_galery():
+    if request.method == 'POST':
+        return ProductController.upload_galery()
+    else:
+        raise Exception("Method not allowed")

@@ -538,6 +538,12 @@
                     },
                     "description": {
                         "type": "string"
+                    },
+                    "galeries": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductGalery"
+                        }
                     }
                 }
             },
@@ -554,6 +560,14 @@
                         "type": "string"
                     },
                     "description": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ProductGalery": {
+                "type": "object",
+                "properties": {
+                    "path": {
                         "type": "string"
                     }
                 }

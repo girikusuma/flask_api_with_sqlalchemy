@@ -1,6 +1,39 @@
+from importlib.resources import path
 from app.model.products import Products
-from app import response, db
+from app.model.product_galeries import ProductGalery
+from app import response, db, upload_config, app
 from flask import request
+import os
+import uuid
+from werkzeug.utils import secure_filename
+
+def upload_galery():
+    try:
+        product_id = request.form.get('produc_id')
+        title = request.form.get('title')
+
+        if 'file' not in request.files:
+            return response.client_error(msg="File not upload", code=400)
+        
+        file = request.files['file']
+        if file.filename == '':
+            return response.client_error(msg="File not upload", code=400)
+        if file and upload_config.allowed_extentions(file.filename):
+            uid = uuid.uuid4()
+            filename = secure_filename(file.filename)
+            rename = "Flask-" + str(uid) + filename
+
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], rename))
+
+            galery = ProductGalery(product_id=product_id ,title=title, path=rename)
+            db.session.add(galery)
+            db.session.commit()
+
+            return response.success(data={'image_path': rename}, msg="Success upload image", code=200)
+        
+        return response.client_error(msg="File extention not allowed", code=400)
+    except Exception as e:
+        return response.server_error(msg="Fail: "+str(e), code=500)
 
 def index():
     try:
@@ -14,10 +47,11 @@ def index():
 def detail(id):
     try:
         product = Products.query.filter_by(id=id).first()
+        galeries = ProductGalery.query.filter((ProductGalery.product_id == id))
         if not product:
             return response.client_error(msg="Product not found", code=400)
         
-        data = format_to_object(product)
+        data = format_to_object(product, galeries)
 
         return response.success(data=data, msg="Get product", code=200)
     except Exception as e:
@@ -80,17 +114,29 @@ def destroy(id):
 def format_to_array(datas):
     ret = []
     for item in datas:
-        ret.append(format_to_object(item))
+        galeries = ProductGalery.query.filter((ProductGalery.product_id == item.id))
+        ret.append(format_to_object(item, galeries))
     
     return ret
 
-def format_to_object(data):
+def format_to_object(data, galery):
     ret = {
         'id': data.id,
         'code': data.code,
         'name': data.name,
         'description': data.description,
-        'category_id': data.category_id
+        'category_id': data.category_id,
+        'galeries': format_to_array_object_galery(galery)
     }
 
+    return ret
+
+def format_to_array_object_galery(datas):
+    ret = []
+
+    for item in datas:
+        ret.append({
+            'path': item.path
+        })
+    
     return ret

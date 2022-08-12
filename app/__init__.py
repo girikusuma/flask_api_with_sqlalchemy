@@ -11,5 +11,5 @@ migrate = Migrate(app, db)
 
 jwt = JWTManager(app)
 
-from app.model import user, categories, products
+from app.model import user, categories, products, product_galeries
 from app import routes
